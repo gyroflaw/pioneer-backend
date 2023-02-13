@@ -1,4 +1,3 @@
-import { Once } from '@discord-nestjs/core';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -17,7 +16,7 @@ export class EventEmitterService {
     private readonly configService: ConfigService,
   ) {}
 
-  @Once('ready')
+  // TODO @Once('ready')
   async onReady(): Promise<void> {
     const wsLocation = this.configService.get<string>('RPC_URL');
     const api: ApiPromise = await connectApi(

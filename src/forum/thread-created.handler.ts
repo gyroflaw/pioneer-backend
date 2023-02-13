@@ -1,11 +1,8 @@
-import { TextChannel } from 'discord.js';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ForumThreadId } from '@joystream/types/primitives';
 
-import { ForumThreadByIdQuery } from 'src/qntypes';
 import { EventWithBlock } from 'src/types';
-import { getNewThreadEmbed } from './forum.embeds';
 import { BaseEventHandler } from './base.event.handler';
 
 @Injectable()
@@ -19,25 +16,7 @@ export class ThreadCreatedHandler extends BaseEventHandler {
     const thread = await this.queryNodeClient.forumThreadById(
       threadId.toString(),
     );
-    const serverChannels = this.findChannelsByThread(thread);
-    serverChannels?.forEach((ch: TextChannel) => {
-      this.logger.debug(
-        `Sending to channel [${ch.id.toString()}] [${ch.name}]`,
-      );
-      ch.send({
-        embeds: [getNewThreadEmbed(thread, payload.block, payload.event)],
-      });
-    });
-  }
-
-  findChannelsByThread(thread: ForumThreadByIdQuery): TextChannel[] {
-    if (!thread.forumThreadByUniqueInput) return [];
-
-    const { id, parentId } = thread.forumThreadByUniqueInput.category;
-    return this.findChannelsByCategoryId(
-      parseInt(id, 10),
-      parentId ? parseInt(parentId, 10) : undefined,
-    );
+    // TODO
   }
 
   getLogger(): Logger {

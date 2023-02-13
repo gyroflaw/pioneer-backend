@@ -1,5 +1,3 @@
-import { Client } from 'discord.js';
-import { InjectDiscordClient, Once } from '@discord-nestjs/core';
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { VideoId } from '@joystream/types/primitives';
@@ -10,8 +8,6 @@ import {
   GetVideoByIdQuery,
 } from 'src/qntypes-atlas';
 import { EventWithBlock } from 'src/types';
-import { findDiscordChannel } from 'src/util';
-import { getVideoEmbed } from './video.embeds';
 import { channelNames } from '../../config';
 
 const VIDEOS_CHANNEL_KEY = 'videos';
@@ -22,13 +18,11 @@ export class VideoCreatedHandler {
 
   constructor(
     protected readonly atlasClient: RetryableAtlasClient,
-    @InjectDiscordClient()
-    protected readonly client: Client,
     @Optional()
     protected distributionBuckets: GetDistributionBucketsWithOperatorsQuery,
   ) {}
 
-  @Once('ready')
+  // TODO @Once('ready')
   async onReady(): Promise<void> {
     this.distributionBuckets =
       await this.atlasClient.getDistributionBucketsWithOperators();
@@ -53,15 +47,6 @@ export class VideoCreatedHandler {
     this.logger.debug(videoQueryNodeResponse.videoByUniqueInput?.title);
     const bag = videoQueryNodeResponse.videoByUniqueInput?.media?.storageBag.id;
     const cdnUrl = this.getDistributorUrl(bag || ' ');
-    if (cdnUrl) {
-      const channelToUse = findDiscordChannel(
-        this.client,
-        channelNames[VIDEOS_CHANNEL_KEY],
-      )[0];
-      channelToUse.send({
-        embeds: [getVideoEmbed(videoQueryNodeResponse, cdnUrl)],
-      });
-    }
   }
 
   getDistributorUrl(bagId: string) {

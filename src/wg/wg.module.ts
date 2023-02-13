@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { DiscordModule } from '@discord-nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { PioneerGraphQLModule } from 'src/gql/pioneer.module';
 import { ApplicationWithdrawnHandler } from './application-withdrawn.handler';
@@ -17,11 +16,7 @@ import { WorkingGroupService } from './wg.service';
 import { BudgetSpendingHandler } from './budget-spending.handler';
 
 @Module({
-  imports: [
-    DiscordModule.forFeature(),
-    ConfigModule.forRoot(),
-    PioneerGraphQLModule,
-  ],
+  imports: [ConfigModule.forRoot(), PioneerGraphQLModule],
   providers: [
     BudgetSetHandler,
     BudgetUpdatedHandler,
